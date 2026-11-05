@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infografica: Assetto di Massima Efficienza e Diruttori</title>
+    <style>
+        /* CSS Custom Properties per Stile Editoriale */
+        :root {
+            --bg-color: #fffff4; /* Fondo avorio */
+            --text-color: #1a1a1a; /* Testo scuro */
+            --text-muted: #4a4a4a;
+            --accent-color: #005b96; /* Accento aeronautico */
+            --accent-hover: #003f69;
+            --card-bg: #ffffff;
+            --border-color: #e0dece;
+            --success-color: #2e7d32;
+            --error-color: #c62828;
+            --focus-ring: 0 0 0 3px rgba(0, 91, 150, 0.4);
+            --transition-speed: 0.3s;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            :root { --transition-speed: 0s; }
+            * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+
+        /* Reset e Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4 { line-height: 1.2; margin-bottom: 0.5em; color: var(--accent-color); }
+        h1 { font-size: 2rem; border-bottom: 2px solid var(--accent-color); padding-bottom: 0.5rem; margin-bottom: 1rem; }
+        h2 { font-size: 1.5rem; }
+        h3 { font-size: 1.25rem; margin-top: 1.5rem; }
+        p { margin-bottom: 1rem; }
+        strong { color: var(--accent-color); }
+        
+        /* Formule Matematiche (Puro HTML/CSS) */
+        .math { font-family: "Times New Roman", Times, serif; font-style: italic; white-space: nowrap; }
+        .math-block { display: block; text-align: center; margin: 1.5rem 0; font-size: 1.2rem; overflow-x: auto;}
+        .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; font-size: 0.9em; padding: 0 0.2rem; }
+        .frac > span.num { border-bottom: 1px solid currentColor; padding-bottom: 0.1em; }
+        .frac > span.den { padding-top: 0.1em; }
+        .radicand { border-top: 1px solid currentColor; padding-top: 0.1em; }
+        .sqrt::before { content: "√"; font-style: normal; margin-right: 0.1em; }
+
+        /* Layout Principale */
+        .container {
+            display: flex;
+            flex-direction: column;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+            flex: 1;
+        }
+
+        @media (min-width: 768px) {
+            .container { flex-direction: row; gap: 2rem; padding: 2rem; }
+            .sidebar { flex: 0 0 250px; position: sticky; top: 2rem; height: calc(100vh - 4rem); overflow-y: auto; }
+            .content { flex: 1; }
+        }
+
+        /* Sidebar / Indice */
+        .sidebar { background: var(--card-bg); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+        .sidebar h2 { font-size: 1.2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem; }
+        .sidebar ul { list-style: none; }
+        .sidebar li { margin-bottom: 0.75rem; }
+        .sidebar a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            display: block;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background var(--transition-speed);
+        }
+        .sidebar a:hover, .sidebar a:focus { background: var(--bg-color); color: var(--accent-color); outline: none; box-shadow: var(--focus-ring); }
+
+        /* Card Sezioni */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+        }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
+        .badge { display: inline-block; background: var(--bg-color); border: 1px solid var(--accent-color); color: var(--accent-color); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; margin-bottom: 1rem; font-weight: bold; }
+        .btn-approfondisci {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background var(--transition-speed);
+            margin-top: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-approfondisci:hover { background: var(--accent-hover); }
+        .btn-approfondisci:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+        /* Modali (Dialog) */
+        dialog {
+            margin: auto;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            background: var(--card-bg);
+            color: var(--text-color);
+            padding: 0;
+            overflow: hidden;
+        }
+        dialog::backdrop { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(2px); }
+        .dialog-header { background: var(--accent-color); color: white; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+        .dialog-header h2 { margin: 0; color: white; }
+        .btn-close { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 0.2rem; }
+        .btn-close:focus-visible { outline: 2px solid white; border-radius: 4px; }
+        .dialog-content { padding: 1.5rem; overflow-y: auto; max-height: calc(90vh - 60px); }
+        
+        /* Definizioni e Tabelle nel modale */
+        .def-box { background: var(--bg-color); border-left: 4px solid var(--accent-color); padding: 1rem; margin: 1rem 0; }
+        .example-box { border: 1px dashed var(--accent-color); padding: 1rem; margin: 1rem 0; background: #fafafa; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { border: 1px solid var(--border-color); padding: 0.5rem; text-align: left; }
+        th { background: var(--bg-color); color: var(--accent-color); }
+
+        /* Simulatore */
+        .sim-container { background: #f0f4f8; padding: 1.5rem; border-radius: 8px; border: 1px solid #c8d8e4; margin: 2rem 0; }
+        .controls { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1rem; }
+        @media(min-width: 600px) { .controls { grid-template-columns: 1fr 1fr; } }
+        .control-group { display: flex; flex-direction: column; }
+        label { font-weight: bold; margin-bottom: 0.5rem; color: var(--accent-color); }
+        input[type="range"] { accent-color: var(--accent-color); cursor: pointer; }
+        .sim-output { display: flex; justify-content: space-between; background: white; padding: 1rem; border-radius: 4px; font-size: 1.2rem; font-weight: bold; border: 1px solid var(--border-color); }
+        .canvas-container { position: relative; width: 100%; height: 200px; background: white; border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; margin-top: 1rem; }
+
+        /* Quiz */
+        .quiz-container { background: white; border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 8px; }
+        .quiz-question { margin-bottom: 1.5rem; display: none; }
+        .quiz-question.active { display: block; }
+        .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }
+        .quiz-option {
+            background: var(--bg-color); border: 1px solid var(--border-color); padding: 1rem;
+            border-radius: 4px; cursor: pointer; text-align: left; font-size: 1rem; transition: all 0.2s;
+        }
+        .quiz-option:hover { background: #e8f0f6; border-color: var(--accent-color); }
+        .quiz-option:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+        .quiz-feedback { margin-top: 1rem; padding: 1rem; border-radius: 4px; display: none; }
+        .quiz-feedback.success { background: #e8f5e9; color: var(--success-color); border: 1px solid var(--success-color); display: block; }
+        .quiz-feedback.error { background: #ffebee; color: var(--error-color); border: 1px solid var(--error-color); display: block; }
+        .quiz-nav { margin-top: 1rem; display: flex; justify-content: space-between; }
+        
+        /* Gap Notice */
+        .gap-notice { background: #fff3cd; border-left: 4px solid #ffc107; padding: 1rem; color: #856404; margin-bottom: 1rem; font-size: 0.9rem; }
+
+        /* Utilities */
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <aside class="sidebar">
+        <h2>Sintesi Argomenti</h2>
+        <nav aria-label="Navigazione interna">
+            <ul>
+                <li><a href="#intro">Introduzione e Forze</a></li>
+                <li><a href="#efficienza">Assetto di Max Efficienza</a></li>
+                <li><a href="#cinematica">Velocità e Discesa</a></li>
+                <li><a href="#autonomia">Autonomia al Suolo</a></li>
+                <li><a href="#diruttori">Diruttori e Sollecitazioni</a></li>
+                <li><a href="#simulazione">Simulatore Interattivo</a></li>
+                <li><a href="#quiz">Mini-Quiz di Verifica</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <header>
+            <h1>Assetto di Massima Efficienza e Diruttori</h1>
+            <p>Infografica didattica sul volo librato, tratta da "Volo Librato.pdf" (Prof. Ing. B. Raucci) e integrazioni strutturali, destinata agli studenti del triennio di Costruzioni Aeronautiche.</p>
+        </header>
+
+        <!-- SEZIONE 1: Equilibrio -->
+        <section id="intro" class="card">
+            <span class="badge">Fonte: PDF, Sez. 1-2 (Pag. 2-3)</span>
+            <h2>1. Le Forze nel Volo Librato</h2>
+            <p>In assenza di spinta (<span class="math">T = 0</span>), il velivolo scende lungo una traiettoria inclinata. La componente del peso lungo la traiettoria funge da propulsore per vincere la resistenza aerodinamica.</p>
+            <div style="text-align:center; padding: 1rem 0;">
+                <svg width="200" height="150" viewBox="0 0 200 150" aria-label="Schema delle forze: Peso, Portanza e Resistenza">
+                    <!-- Traiettoria -->
+                    <line x1="20" y1="20" x2="180" y2="100" stroke="#ccc" stroke-dasharray="5,5" stroke-width="2"/>
+                    <!-- Velivolo -->
+                    <circle cx="100" cy="60" r="4" fill="#005b96"/>
+                    <!-- Portanza L (perpendicolare alla traiettoria) -->
+                    <line x1="100" y1="60" x2="120" y2="20" stroke="#005b96" stroke-width="2" marker-end="url(#arrow)"/>
+                    <text x="125" y="25" fill="#005b96" font-weight="bold">L</text>
+                    <!-- Resistenza D (parallela alla traiettoria, indietro) -->
+                    <line x1="100" y1="60" x2="60" y2="40" stroke="#c62828" stroke-width="2" marker-end="url(#arrow-red)"/>
+                    <text x="50" y="35" fill="#c62828" font-weight="bold">D</text>
+                    <!-- Peso W (verticale) -->
+                    <line x1="100" y1="60" x2="100" y2="130" stroke="#1a1a1a" stroke-width="2" marker-end="url(#arrow-black)"/>
+                    <text x="105" y="125" fill="#1a1a1a" font-weight="bold">W</text>
+                    
+                    <defs>
+                        <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#005b96" />
+                        </marker>
+                        <marker id="arrow-red" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#c62828" />
+                        </marker>
+                        <marker id="arrow-black" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a" />
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
+            <button class="btn-approfondisci" aria-expanded="false" aria-controls="modal-1" onclick="openModal('modal-1')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                Approfondisci Modello Matematico
+            </button>
+        </section>
+
+        <!-- SEZIONE 2: Efficienza Max -->
+        <section id="efficienza" class="card">
+            <span class="badge">Fonte: PDF, Sez. 3 e 7.1 (Pag. 4, 7-8)</span>
+            <h2>2. Assetto di Massima Efficienza</h2>
+            <p>L'efficienza aerodinamica (<span class="math">E</span>) determina l'angolo di planata. L'assetto di massima efficienza garantisce la planata più "dolce" (angolo minimo di discesa).</p>
+            <div class="math-block">
+                <span class="math">E<sub>max</sub></span> = 
+                <div class="frac">
+                    <span class="num">1</span>
+                    <span class="den">2 <span class="sqrt"><span class="radicand">k C<sub>D0</sub></span></span></span>
+                </div>
+            </div>
+            <button class="btn-approfondisci" aria-expanded="false" aria-controls="modal-2" onclick="openModal('modal-2')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                Dimostrazioni e Parametri Ottimali
+            </button>
+        </section>
+
+        <!-- SEZIONE 3: Velocità e Discesa -->
+        <section id="cinematica" class="card">
+            <span class="badge">Fonte: PDF, Sez. 4-5 (Pag. 4-5)</span>
+            <h2>3. Velocità di Planata e Rateo di Discesa</h2>
+            <p>La velocità sulla traiettoria cresce con il peso (carico alare), ma l'angolo di planata in aria calma non cambia. Il rateo di discesa (perdita di quota nel tempo) rappresenta la potenza dissipata per unità di peso.</p>
+            <button class="btn-approfondisci" aria-expanded="false" aria-controls="modal-3" onclick="openModal('modal-3')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                Analisi Cinematica ed Esempio
+            </button>
+        </section>
+
+        <!-- SEZIONE 4: Autonomia -->
+        <section id="autonomia" class="card">
+            <span class="badge">Fonte: PDF, Sez. 6 e 11 (Pag. 6, 12-13)</span>
+            <h2>4. Autonomia di Distanza</h2>
+            <p>In aria calma, la distanza percorsa al suolo dipende esclusivamente dalla quota persa e dall'efficienza. Il peso dell'aeromobile non ha alcuna influenza sulla distanza raggiungibile.</p>
+            <div class="math-block">
+                <span class="math">R = Δh · E</span>
+            </div>
+            <button class="btn-approfondisci" aria-expanded="false" aria-controls="modal-4" onclick="openModal('modal-4')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                Effetto del Vento e Calcolo Autonomia
+            </button>
+        </section>
+
+        <!-- SEZIONE 5: Diruttori -->
+        <section id="diruttori" class="card">
+            <span class="badge">Fonte: Immagine di Riferimento</span>
+            <h2>5. Diruttori (Spoilers) e Sollecitazioni</h2>
+            <div class="gap-notice">
+                <strong>Nota Scientifica:</strong> Il testo "Volo Librato.pdf" non tratta i diruttori. I contenuti di questa sezione colmano la lacuna analizzando i dati presenti nello schema visivo fornito.
+            </div>
+            <p>I diruttori sono superfici mobili poste sull'estradosso alare. Servono a variare drasticamente l'aerodinamica per permettere discese ripide (modificando l'angolo di planata) senza incorrere in eccessi di velocità.</p>
+            <button class="btn-approfondisci" aria-expanded="false" aria-controls="modal-5" onclick="openModal('modal-5')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                Funzionamento Strutturale e Aerodinamico
+            </button>
+        </section>
+
+        <!-- SIMULATORE INTERATTIVO -->
+        <section id="simulazione" class="sim-container">
+            <h2>Simulatore: Traiettoria di Planata (Aria Calma)</h2>
+            <p>Varia la quota iniziale e l'efficienza per visualizzare l'autonomia al suolo calcolata in tempo reale.</p>
+            <div class="controls">
+                <div class="control-group">
+                    <label for="sim-quota">Quota Iniziale (Δh): <span id="val-quota">2000</span> m</label>
+                    <input type="range" id="sim-quota" min="500" max="5000" step="100" value="2000" aria-label="Regola la quota">
+                </div>
+                <div class="control-group">
+                    <label for="sim-eff">Efficienza (E): <span id="val-eff">20</span></label>
+                    <input type="range" id="sim-eff" min="5" max="50" step="1" value="20" aria-label="Regola l'efficienza">
+                </div>
+            </div>
+            <div class="sim-output">
+                <span>Distanza Percorsa (R):</span>
+                <span id="val-distanza" style="color: var(--accent-color);">40.0 km</span>
+            </div>
+            <div class="canvas-container" aria-hidden="true">
+                <!-- SVG per simulazione traiettoria -->
+                <svg id="sim-svg" width="100%" height="100%" viewBox="0 0 1000 200" preserveAspectRatio="none">
+                    <rect width="100%" height="100%" fill="#e3f2fd" />
+                    <line x1="0" y1="190" x2="1000" y2="190" stroke="#795548" stroke-width="20"/> <!-- Terreno -->
+                    <path id="sim-path" d="M 50 10 L 450 180" stroke="var(--accent-color)" stroke-width="4" stroke-dasharray="8,4" fill="none"/>
+                    <circle id="sim-plane" cx="50" cy="10" r="8" fill="#c62828"/>
+                </svg>
+            </div>
+            <small style="display:block; margin-top:0.5rem; color: var(--text-muted);">
+                * <strong>Ipotesi e limiti:</strong> Atmosfera standard calma (assenza di vento). L'angolo è assunto piccolo, valendo l'approssimazione tan(γ) ≈ γ.
+            </small>
+        </section>
+
+        <!-- MINI QUIZ -->
+        <section id="quiz" class="quiz-container">
+            <h2>Mini-Quiz di Verifica</h2>
+            <div id="q1" class="quiz-question active">
+                <p><strong>Domanda 1/3:</strong> In aria calma, se un aliante viene zavorrato aumentando il proprio peso del 30%, cosa succede alla distanza massima percorribile rispetto al suolo?</p>
+                <div class="quiz-options">
+                    <button class="quiz-option" onclick="checkAnswer(1, false)">Diminuisce proporzionalmente al peso.</button>
+                    <button class="quiz-option" onclick="checkAnswer(1, true)">Resta esattamente identica.</button>
+                    <button class="quiz-option" onclick="checkAnswer(1, false)">Aumenta grazie alla maggiore inerzia.</button>
+                </div>
+                <div id="fb1" class="quiz-feedback"></div>
+            </div>
+            <div id="q2" class="quiz-question">
+                <p><strong>Domanda 2/3:</strong> Analiticamente (tramite la polare parabolica), quando si raggiunge l'assetto di massima efficienza?</p>
+                <div class="quiz-options">
+                    <button class="quiz-option" onclick="checkAnswer(2, false)">Quando la resistenza indotta è il triplo di quella di profilo.</button>
+                    <button class="quiz-option" onclick="checkAnswer(2, true)">Quando la resistenza indotta eguaglia la resistenza di profilo.</button>
+                    <button class="quiz-option" onclick="checkAnswer(2, false)">Quando l'angolo d'attacco è nullo.</button>
+                </div>
+                <div id="fb2" class="quiz-feedback"></div>
+            </div>
+            <div id="q3" class="quiz-question">
+                <p><strong>Domanda 3/3:</strong> Qual è lo scopo primario dell'estrazione dei diruttori in fase di avvicinamento?</p>
+                <div class="quiz-options">
+                    <button class="quiz-option" onclick="checkAnswer(3, false)">Aumentare la portanza per evitare lo stallo.</button>
+                    <button class="quiz-option" onclick="checkAnswer(3, false)">Ridurre la resistenza per allungare la planata.</button>
+                    <button class="quiz-option" onclick="checkAnswer(3, true)">Aumentare la resistenza per scendere più rapidamente senza aumentare la velocità.</button>
+                </div>
+                <div id="fb3" class="quiz-feedback"></div>
+            </div>
+            <div class="quiz-nav">
+                <button id="btn-next-quiz" class="btn-approfondisci" style="display:none;" onclick="nextQuestion()">Prossima Domanda ➔</button>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<!-- ================= MODALI (APPROFONDIMENTI) ================= -->
+
+<!-- MODAL 1: Equilibrio -->
+<dialog id="modal-1" aria-labelledby="title-m1">
+    <div class="dialog-header">
+        <h2 id="title-m1">1. Le Equazioni di Equilibrio</h2>
+        <button class="btn-close" aria-label="Chiudi" onclick="closeModal('modal-1')">×</button>
+    </div>
+    <div class="dialog-content">
+        <p>Nel volo librato stabile, in terna vento, le uniche forze agenti sono Portanza (L), Resistenza (D) e Peso (W). Essendo la spinta nulla (<span class="math">T=0</span>), le equazioni si semplificano:</p>
+        
+        <div class="def-box">
+            <strong>Equazioni Cardine:</strong><br>
+            1. Sostentamento: <span class="math">L = W cos(γ<sub>d</sub>)</span><br>
+            2. Propulsione: <span class="math">D = -W sin(γ<sub>d</sub>)</span><br>
+            <em>(dove γ<sub>d</sub> < 0 è l'angolo di planata)</em>
+        </div>
+        
+        <p>Dividendo membro a membro otteniamo l'Angolo di Planata:</p>
+        <div class="math-block">
+            <span class="math">tan(γ<sub>d</sub>) ≈ γ<sub>d</sub> = - <div class="frac"><span class="num">D</span><span class="den">L</span></div> = - <div class="frac"><span class="num">1</span><span class="den">E</span></div></span>
+        </div>
+
+        <div class="example-box">
+            <strong>Esempio Svolto (Velivolo Turismo vs Aliante):</strong><br>
+            - Turismo (<span class="math">E = 10</span>): γ<sub>d</sub> = -1/10 = -0.1 rad = <strong>-5.7°</strong><br>
+            - Aliante (<span class="math">E = 40</span>): γ<sub>d</sub> = -1/40 = -0.025 rad = <strong>-1.4°</strong><br>
+            <em>Interpretazione: a parità di quota, l'aliante descrive una traiettoria quasi orizzontale rispetto al velivolo da turismo. (PDF, Pag. 4)</em>
+        </div>
+        
+        <p><strong>Simboli:</strong> γ<sub>d</sub> [rad] (angolo), E (Efficienza, adimensionale), W [N] (Peso).</p>
+    </div>
+</dialog>
+
+<!-- MODAL 2: Max Efficienza -->
+<dialog id="modal-2" aria-labelledby="title-m2">
+    <div class="dialog-header">
+        <h2 id="title-m2">2. Ricerca della Massima Efficienza</h2>
+        <button class="btn-close" aria-label="Chiudi" onclick="closeModal('modal-2')">×</button>
+    </div>
+    <div class="dialog-content">
+        <p>Utilizzando la polare parabolica <span class="math">C<sub>D</sub> = C<sub>D0</sub> + k C<sub>L</sub><sup>2</sup></span>, cerchiamo il massimo della funzione Efficienza E = C<sub>L</sub> / C<sub>D</sub>.</p>
+        <p>Annullando la derivata prima rispetto al C<sub>L</sub> (<span class="math">dE/dC<sub>L</sub> = 0</span>), troviamo che la condizione di ottimalità si verifica quando la resistenza indotta eguaglia quella di forma:</p>
+        
+        <div class="def-box">
+            <strong>Condizione di E<sub>max</sub>:</strong>
+            <span class="math">k C<sub>L</sub><sup>2</sup> = C<sub>D0</sub></span>
+            <br><br>
+            <strong>C<sub>L</sub> Ottimale:</strong>
+            <span class="math">C<sub>L</sub><sup>*</sup> = <span class="sqrt"><span class="radicand">C<sub>D0</sub> / k</span></span></span>
+        </div>
+
+        <div class="example-box">
+            <strong>Passaggio Dimostrativo (PDF, Pag. 7):</strong><br>
+            Sostituendo il <span class="math">C<sub>L</sub><sup>*</sup></span> nella formula dell'efficienza:<br>
+            <span class="math">E<sub>max</sub> = C<sub>L</sub><sup>*</sup> / (2 C<sub>D0</sub>) = 1 / (2 <span class="sqrt"><span class="radicand">k C<sub>D0</sub></span></span>)</span><br>
+            Ricordando che <span class="math">k = 1 / (π AR e)</span>, l'efficienza massima risulta dipendere fortemente dall'Allungamento Alare (AR).
+        </div>
+    </div>
+</dialog>
+
+<!-- MODAL 3: Cinematica -->
+<dialog id="modal-3" aria-labelledby="title-m3">
+    <div class="dialog-header">
+        <h2 id="title-m3">3. Cinematica: Velocità e Rateo</h2>
+        <button class="btn-close" aria-label="Chiudi" onclick="closeModal('modal-3')">×</button>
+    </div>
+    <div class="dialog-content">
+        <p>Dall'equilibrio della portanza (<span class="math">L = W cos(γ<sub>d</sub>)</span>), esplicitando la formula aerodinamica, si ottiene la velocità di volo lungo la traiettoria:</p>
+        
+        <div class="math-block">
+            <span class="math">V = <span class="sqrt"><span class="radicand"><div class="frac"><span class="num">2 W</span><span class="den">ρ S</span></div> · <div class="frac"><span class="num">cos(γ<sub>d</sub>)</span><span class="den">C<sub>L</sub></span></div></span></span></span>
+        </div>
+
+        <p>Il <strong>Rateo di Discesa (v<sub>d</sub>)</strong>, o velocità verticale, è <span class="math">V sin(γ<sub>d</sub>)</span>.</p>
+        <div class="def-box">
+            <span class="math">v<sub>d</sub> ≈ - <span class="sqrt"><span class="radicand"><div class="frac"><span class="num">2 W</span><span class="den">ρ S</span></div></span></span> · <div class="frac"><span class="num">C<sub>D</sub></span><span class="den">C<sub>L</sub><sup>3/2</sup></span></div></span>
+        </div>
+
+        <div class="example-box">
+            <strong>Massima Distanza vs Massima Durata (PDF, Pag. 8):</strong><br>
+            - Per la <em>Massima Distanza</em> volo alla velocità di max efficienza.<br>
+            - Per la <em>Massima Durata</em> (minimo rateo di discesa) devo massimizzare il rapporto <span class="math">C<sub>L</sub><sup>3/2</sup>/C<sub>D</sub></span>, che richiede un assetto più "cabrato" (velocità inferiore). Volare alla velocità di minima potenza fa restare in aria più a lungo, ma fa fare meno strada.
+        </div>
+        <p><strong>Unità di Misura:</strong> V [m/s], v<sub>d</sub> [m/s], ρ [kg/m³], S [m²] (Superficie alare).</p>
+    </div>
+</dialog>
+
+<!-- MODAL 4: Autonomia -->
+<dialog id="modal-4" aria-labelledby="title-m4">
+    <div class="dialog-header">
+        <h2 id="title-m4">4. Calcolo Autonomia (Range)</h2>
+        <button class="btn-close" aria-label="Chiudi" onclick="closeModal('modal-4')">×</button>
+    </div>
+    <div class="dialog-content">
+        <p>Integrando la pendenza della traiettoria tra la quota iniziale e finale, otteniamo la formula madre dell'autonomia al suolo in aria calma:</p>
+        
+        <div class="def-box">
+            <span class="math">R = Δh · E</span>
+        </div>
+
+        <div class="example-box">
+            <strong>Esempio Calcolo (PDF, Pag. 6):</strong><br>
+            Velivolo con avaria a quota <span class="math">h = 2000 m</span>.<br>
+            Se E = 20 ➔ <span class="math">R = 2000 · 20 = 40.000 m (40 km)</span>.<br>
+            Il peso NON modifica questa distanza in assenza di vento. Un velivolo identico, ma caricato col doppio del peso, arriverebbe allo stesso punto, ma impiegando meno tempo (perché scende più veloce).
+        </div>
+
+        <h3>Effetto del Vento (PDF, Pag 12-13)</h3>
+        <p>Il vento modifica l'angolo di planata <em>rispetto al suolo</em> (<span class="math">γ<sub>d</sub><sup>w</sup></span>). In presenza di vento contrario (<span class="math">u<sub>w</sub> < 0</span>), l'angolo aumenta (discesa più ripida) e l'autonomia si riduce. In questo caso, il peso diventa un vantaggio: i velivoli più pesanti (e quindi più veloci) subiscono per minor tempo l'azione avversa del vento, perdendo meno autonomia.</p>
+    </div>
+</dialog>
+
+<!-- MODAL 5: Diruttori -->
+<dialog id="modal-5" aria-labelledby="title-m5">
+    <div class="dialog-header">
+        <h2 id="title-m5">5. Diruttori: Analisi e Sollecitazioni</h2>
+        <button class="btn-close" aria-label="Chiudi" onclick="closeModal('modal-5')">×</button>
+    </div>
+    <div class="dialog-content">
+        <div class="gap-notice">
+            Il riferimento testuale PDF è privo di dettagli sui Diruttori. Il contenuto segue lo schema visivo analitico fornito a completamento dell'unità didattica.
+        </div>
+        <p>I <strong>Diruttori</strong> (o Spoilers) sono piastre retraibili situate sull'estradosso (dorso) dell'ala, particolarmente diffusi sugli alianti, che hanno efficienze estreme e faticano a perdere quota per l'atterraggio.</p>
+        
+        <div class="def-box">
+            <strong>Azione Aerodinamica Concatenata:</strong><br>
+            1. <em>Distruzione della portanza:</em> Estratti, causano il distacco della vena fluida, crollando drasticamente il C<sub>L</sub> locale.<br>
+            2. <em>Aumento Resistenza (Drag):</em> Generano scia turbolenta aumentando enormemente il C<sub>D</sub>.<br>
+            3. <em>Effetto su γ<sub>d</sub>:</em> Essendo <span class="math">γ<sub>d</sub> ≈ -C<sub>D</sub>/C<sub>L</sub></span>, l'estrazione peggiora brutalmente l'Efficienza, permettendo angoli di discesa ripidissimi.
+        </div>
+
+        <div class="example-box">
+            <strong>Vantaggio Cinematica: Discesa Ripida Sicura</strong><br>
+            Senza diruttori, l'unico modo per scendere più ripidamente sarebbe "picchiare", causando un rapido aumento di velocità (pericolo di cedimento strutturale o VNE - Velocity Never Exceed). Con i diruttori, la resistenza compensa il peso lungo la traiettoria ripida, mantenendo la velocità di planata entro limiti operativi sicuri.
+        </div>
+
+        <h3>Momento Flettente alla Radice</h3>
+        <p>Come evidenziato dallo schema, per massimizzare l'Efficienza (<span class="math">E<sub>max</sub></span>) è necessario un elevatissimo Allungamento Alare (AR). Tuttavia, ali lunghe generano un enorme "braccio" per la distribuzione di portanza, risultando in un severo <strong>Momento Flettente alla radice dell'ala</strong>, che impone limiti strutturali e materiali compositi rigidi nel design aeronautico.</p>
+    </div>
+</dialog>
+
+<script>
+    /* ================= GESTIONE MODALI ================= */
+    let lastFocusedElement;
+
+    function openModal(modalId) {
+        const modal = document.getElementById(modalId);
+        lastFocusedElement = document.activeElement;
+        
+        // Aggiorna aria-expanded
+        if (lastFocusedElement) {
+            lastFocusedElement.setAttribute('aria-expanded', 'true');
+        }
+        
+        modal.showModal();
+        
+        // Gestione focus trap basic nativa (il browser la gestisce col tag dialog)
+        // Setta il focus sul bottone di chiusura
+        const closeBtn = modal.querySelector('.btn-close');
+        if(closeBtn) closeBtn.focus();
+    }
+
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        modal.close();
+        
+        if (lastFocusedElement) {
+            lastFocusedElement.setAttribute('aria-expanded', 'false');
+            lastFocusedElement.focus();
+        }
+    }
+
+    // Chiudi modale se si clicca fuori (sul backdrop)
+    document.querySelectorAll('dialog').forEach(dialog => {
+        dialog.addEventListener('click', (event) => {
+            const rect = dialog.getBoundingClientRect();
+            const isInDialog = (rect.top <= event.clientY && event.clientY <= rect.top + rect.height
+                && rect.left <= event.clientX && event.clientX <= rect.left + rect.width);
+            if (!isInDialog) {
+                closeModal(dialog.id);
+            }
+        });
+    });
+
+
+    /* ================= SIMULATORE CINEMATICO ================= */
+    const quotaInput = document.getElementById('sim-quota');
+    const effInput = document.getElementById('sim-eff');
+    const valQuota = document.getElementById('val-quota');
+    const valEff = document.getElementById('val-eff');
+    const valDist = document.getElementById('val-distanza');
+    
+    const svgPath = document.getElementById('sim-path');
+    const svgPlane = document.getElementById('sim-plane');
+
+    function updateSimulation() {
+        const h = parseFloat(quotaInput.value);
+        const e = parseFloat(effInput.value);
+        
+        valQuota.textContent = h;
+        valEff.textContent = e;
+        
+        // Calcolo Range in km
+        const r_m = h * e;
+        const r_km = (r_m / 1000).toFixed(1);
+        valDist.textContent = r_km + " km";
+
+        // Aggiornamento Visuale SVG (Mappa concettuale dei valori su coordinate SVG)
+        // Coordinata X max = 950. Coordinata Y = 10 (cielo) a 190 (terra)
+        const startX = 50;
+        const startY = 10;
+        const groundY = 190;
+        
+        // Proporzionalità per la visualizzazione:
+        // Efficienza maggiore -> atterra più lontano (X maggiore)
+        // Max efficienza (50) mappa a 950 px.
+        const targetX = startX + (e / 50) * 900; 
+        
+        svgPath.setAttribute('d', `M ${startX} ${startY} L ${targetX} ${groundY}`);
+        svgPlane.setAttribute('cx', targetX);
+        svgPlane.setAttribute('cy', groundY);
+    }
+
+    quotaInput.addEventListener('input', updateSimulation);
+    effInput.addEventListener('input', updateSimulation);
+    
+    // Init
+    updateSimulation();
+
+
+    /* ================= MINI QUIZ ================= */
+    let currentQuestion = 1;
+    const totalQuestions = 3;
+
+    function checkAnswer(qNum, isCorrect) {
+        const feedbackDiv = document.getElementById('fb' + qNum);
+        const options = document.querySelectorAll('#q' + qNum + ' .quiz-option');
+        
+        // Disable options after answer
+        options.forEach(opt => opt.disabled = true);
+
+        if (isCorrect) {
+            feedbackDiv.textContent = "✅ Corretto! ";
+            feedbackDiv.className = "quiz-feedback success";
+            
+            // Spiegazioni
+            if(qNum === 1) feedbackDiv.textContent += "In aria calma la distanza dipende solo da quota ed efficienza. Il peso influenza solo la velocità di discesa.";
+            if(qNum === 2) feedbackDiv.textContent += "Esatto. L'efficienza è massima quando la resistenza indotta uguaglia quella di profilo, ossia k C_L^2 = C_D0.";
+            if(qNum === 3) feedbackDiv.textContent += "Corretto. I diruttori distruggono la portanza (aumentando la resistenza), permettendo di scendere con un angolo molto ripido senza eccedere i limiti di velocità strutturale.";
+            
+            document.getElementById('btn-next-quiz').style.display = (currentQuestion < totalQuestions) ? "inline-flex" : "none";
+        } else {
+            feedbackDiv.textContent = "❌ Sbagliato. Riprova o consulta l'approfondimento della relativa sezione.";
+            feedbackDiv.className = "quiz-feedback error";
+            // Allow retry
+            options.forEach(opt => opt.disabled = false);
+        }
+    }
+
+    function nextQuestion() {
+        if(currentQuestion < totalQuestions) {
+            document.getElementById('q' + currentQuestion).classList.remove('active');
+            currentQuestion++;
+            document.getElementById('q' + currentQuestion).classList.add('active');
+            document.getElementById('btn-next-quiz').style.display = "none";
+        }
+    }
+</script>
+
+</body>
+</html>
